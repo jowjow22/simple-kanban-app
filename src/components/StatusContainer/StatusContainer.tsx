@@ -1,9 +1,10 @@
 import { Task as TaskComponent } from "../Task/Task";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback } from "react";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "../../models/ItemTypes";
 import type { Task } from "../../models/Task";
 import { Status } from "../../models/Status";
+import { TasksList } from "./components/TasksList";
 import { cva } from "class-variance-authority";
 
 interface IStatusBoardProps {
@@ -32,12 +33,6 @@ export const StatusBoard = ({
   ownStatus,
   updateOrdering,
 }: IStatusBoardProps) => {
-  const [ownTasks, setOwnTasks] = useState(tasks);
-
-  useEffect(() => {
-    setOwnTasks(tasks);
-  }, [tasks]);
-
   const [{ isActive, previewItem }, drop] = useDrop(
     () => ({
       accept: ItemTypes.task,
@@ -62,27 +57,13 @@ export const StatusBoard = ({
 
   const reOrderTasks = useCallback(
     (dragIndex: number, hoverIndex: number) => {
-      const auxTasks = [...ownTasks];
+      const auxTasks = [...tasks];
       const [removed] = auxTasks.splice(dragIndex, 1);
       auxTasks.splice(hoverIndex, 0, removed);
-      setOwnTasks(auxTasks);
       updateOrdering(auxTasks);
     },
-    [ownTasks, updateOrdering]
+    [tasks, updateOrdering]
   );
-
-  const renderTasks = useCallback(() => {
-    return ownTasks.map((task, index: number) => (
-      <TaskComponent
-        key={task.id}
-        id={task.id}
-        title={task.title}
-        index={index}
-        status={task.status}
-        reOrder={reOrderTasks}
-      />
-    ));
-  }, [reOrderTasks, ownTasks]);
 
   const boardClass = boardVariants({ status: ownStatus });
 
@@ -91,7 +72,7 @@ export const StatusBoard = ({
       className={boardClass}
       ref={drop as unknown as React.Ref<HTMLDivElement>}
     >
-      {renderTasks()}
+      <TasksList tasks={tasks} reOrderTasks={reOrderTasks} />
 
       {isActive && (
         <TaskComponent
