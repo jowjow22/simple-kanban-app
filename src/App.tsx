@@ -14,6 +14,18 @@ function App() {
           index: 0,
           status: Status.todo,
         },
+        {
+          id: 2,
+          title: "Task 2",
+          index: 1,
+          status: Status.todo,
+        },
+        {
+          id: 3,
+          title: "Task 3",
+          index: 2,
+          status: Status.todo,
+        },
       ],
       [Status.inProgress]: [],
       [Status.done]: [],
@@ -34,6 +46,13 @@ function App() {
               ),
             }));
           }}
+          updateOrdering={(tasks) => {
+            console.log("Updating todo tasks order", tasks);
+            setTasksByStatus((prev) => ({
+              ...prev,
+              [Status.todo]: tasks,
+            }));
+          }}
         />
         <StatusContainer
           tasks={tasksByStatus.inProgress}
@@ -46,6 +65,13 @@ function App() {
               [oldStatusAndId.status]: prev[oldStatusAndId.status].filter(
                 (t) => t.id !== oldStatusAndId.id
               ),
+            }));
+          }}
+          updateOrdering={(tasks) => {
+            console.log("Updating tasks in progress order", tasks);
+            setTasksByStatus((prev) => ({
+              ...prev,
+              [Status.inProgress]: tasks,
             }));
           }}
         />

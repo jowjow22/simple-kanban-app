@@ -12,12 +12,14 @@ interface IStatusContainerProps {
     oldStatusAndId: { id: number; status: Status }
   ) => void;
   ownStatus: Status;
+  updateOrdering: (tasks: Task[]) => void;
 }
 
 export const StatusContainer = ({
   tasks,
   updateOwnTasks,
   ownStatus,
+  updateOrdering,
 }: IStatusContainerProps) => {
   const [ownTasks, setOwnTasks] = useState(tasks);
 
@@ -25,7 +27,7 @@ export const StatusContainer = ({
     setOwnTasks(tasks);
   }, [tasks]);
 
-  const [{ canDrop, isOver }, drop] = useDrop(
+  const [_, drop] = useDrop(
     () => ({
       accept: ItemTypes.task,
       drop: (item: Task) => {
@@ -33,6 +35,7 @@ export const StatusContainer = ({
           id: item.id,
           status: item.status,
         };
+        if (ownStatus === oldStatusAndId.status) return;
         updateOwnTasks({ ...item, status: ownStatus }, oldStatusAndId);
       },
       collect: (monitor) => ({
@@ -49,9 +52,9 @@ export const StatusContainer = ({
       const [removed] = auxTasks.splice(dragIndex, 1);
       auxTasks.splice(hoverIndex, 0, removed);
       setOwnTasks(auxTasks);
-      console.log("Reordered tasks:", auxTasks);
+      updateOrdering(auxTasks);
     },
-    [ownTasks]
+    [ownTasks, updateOrdering]
   );
 
   const renderTasks = useCallback(() => {
