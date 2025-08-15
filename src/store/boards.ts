@@ -41,14 +41,19 @@ const useStore = create<BoardsState>((set) => ({
       return { boards: { ...state.boards, [status]: [...board, task] } };
     }),
   updateFullBoard: (tasks: Task[], status: Status) =>
-    set((state) => ({
-      boards: { ...state.boards, [status]: tasks },
-    })),
+    set((state) => {
+      console.log("Updating full board for status:", status);
+      return {
+        boards: { ...state.boards, [status]: tasks },
+      };
+    }),
   moveTaskFromBoard: (
     task: Task,
     oldStatusAndId: { status: Status; id: number }
   ) =>
-    set((state) => ({
+    set((state) => {
+      console.log('Moving task:', task, 'from', oldStatusAndId.status, 'to', task.status);
+      return {
       boards: {
         ...state.boards,
         [task.status]: [...state.boards[task.status], task],
@@ -56,7 +61,8 @@ const useStore = create<BoardsState>((set) => ({
           (t) => t.id !== oldStatusAndId.id
         ),
       },
-    })),
+    }
+    }),
 }));
 
 export default useStore;

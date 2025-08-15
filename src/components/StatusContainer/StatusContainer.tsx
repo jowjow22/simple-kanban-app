@@ -3,9 +3,10 @@ import { useCallback, useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "../../models/ItemTypes";
 import type { Task } from "../../models/Task";
-import type { Status } from "../../models/Status";
+import { Status } from "../../models/Status";
+import { cva } from "class-variance-authority";
 
-interface IStatusContainerProps {
+interface IStatusBoardProps {
   tasks: Task[];
   updateOwnTasks: (
     item: Task,
@@ -15,12 +16,22 @@ interface IStatusContainerProps {
   updateOrdering: (tasks: Task[]) => void;
 }
 
-export const StatusContainer = ({
+const boardVariants = cva("w-92 h-full", {
+  variants: {
+    status: {
+      [Status.todo]: "bg-blue-100",
+      [Status.inProgress]: "bg-yellow-100",
+      [Status.done]: "bg-green-100",
+    },
+  },
+});
+
+export const StatusBoard = ({
   tasks,
   updateOwnTasks,
   ownStatus,
   updateOrdering,
-}: IStatusContainerProps) => {
+}: IStatusBoardProps) => {
   const [ownTasks, setOwnTasks] = useState(tasks);
 
   useEffect(() => {
@@ -73,9 +84,11 @@ export const StatusContainer = ({
     ));
   }, [reOrderTasks, ownTasks]);
 
+  const boardClass = boardVariants({ status: ownStatus });
+
   return (
     <div
-      className="w-92 h-full bg-teal-200"
+      className={boardClass}
       ref={drop as unknown as React.Ref<HTMLDivElement>}
     >
       {renderTasks()}
