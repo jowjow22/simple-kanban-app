@@ -2,20 +2,41 @@ import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { XYCoord } from "dnd-core";
 import type { Status } from "../../models/Status";
+import { cva } from "class-variance-authority";
 
 interface ITaskProps {
   id: number;
   title: string;
   index: number;
   status: Status;
+  isDropPreview?: boolean;
   reOrder: (dragIndex: number, hoverIndex: number) => void;
 }
+
+const taskStyles = cva(
+  "w-full h-fit border border-gray-300 p-2 bg-white shadow-sm",
+  {
+    variants: {
+      isDragging: {
+        true: "opacity-50",
+        false: "opacity-100",
+      },
+    },
+  }
+);
 
 interface ITaskDragItem extends Omit<ITaskProps, "reOrder"> {
   originalIndex?: number;
 }
 
-export const Task = ({ title, index, id, reOrder, status }: ITaskProps) => {
+export const Task = ({
+  title,
+  index,
+  id,
+  reOrder,
+  status,
+  isDropPreview,
+}: ITaskProps) => {
   const taskRef = useRef<HTMLDivElement>(null);
   const [{ isDragging }, drag] = useDrag<
     ITaskDragItem,
@@ -71,9 +92,7 @@ export const Task = ({ title, index, id, reOrder, status }: ITaskProps) => {
 
   return (
     <article
-      className={`w-full h-fit border border-gray-300 p-2 bg-white shadow-sm ${
-        isDragging ? "opacity-50" : "opacity-100"
-      }`}
+      className={taskStyles({ isDragging: isDragging || isDropPreview })}
       ref={taskRef}
     >
       <h2>{title}</h2>

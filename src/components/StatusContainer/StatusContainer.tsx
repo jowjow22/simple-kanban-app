@@ -27,7 +27,7 @@ export const StatusContainer = ({
     setOwnTasks(tasks);
   }, [tasks]);
 
-  const [_, drop] = useDrop(
+  const [{ isActive, previewItem }, drop] = useDrop(
     () => ({
       accept: ItemTypes.task,
       drop: (item: Task) => {
@@ -39,8 +39,11 @@ export const StatusContainer = ({
         updateOwnTasks({ ...item, status: ownStatus }, oldStatusAndId);
       },
       collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
+        isActive:
+          monitor.isOver() &&
+          monitor.canDrop() &&
+          monitor.isOver({ shallow: true }),
+        previewItem: monitor.getItem(),
       }),
     }),
     [updateOwnTasks]
@@ -71,8 +74,23 @@ export const StatusContainer = ({
   }, [reOrderTasks, ownTasks]);
 
   return (
-    <div className="w-92 h-full bg-teal-200 grid place-items-center" ref={drop}>
+    <div
+      className="w-92 h-full bg-teal-200"
+      ref={drop as unknown as React.Ref<HTMLDivElement>}
+    >
       {renderTasks()}
+
+      {isActive && (
+        <TaskComponent
+          key={previewItem.id}
+          id={previewItem.id}
+          title={previewItem.title}
+          index={-1}
+          status={ownStatus}
+          reOrder={reOrderTasks}
+          isDropPreview={isActive}
+        />
+      )}
     </div>
   );
 };
