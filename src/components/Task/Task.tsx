@@ -1,11 +1,13 @@
 import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { XYCoord } from "dnd-core";
+import type { Status } from "../../models/Status";
 
 interface ITaskProps {
   id: number;
   title: string;
   index: number;
+  status: Status;
   reOrder: (dragIndex: number, hoverIndex: number) => void;
 }
 
@@ -13,7 +15,7 @@ interface ITaskDragItem extends Omit<ITaskProps, "reOrder"> {
   originalIndex?: number;
 }
 
-export const Task = ({ title, index, id, reOrder }: ITaskProps) => {
+export const Task = ({ title, index, id, reOrder, status }: ITaskProps) => {
   const taskRef = useRef<HTMLDivElement>(null);
   const [{ isDragging }, drag] = useDrag<
     ITaskDragItem,
@@ -21,7 +23,7 @@ export const Task = ({ title, index, id, reOrder }: ITaskProps) => {
     { isDragging: boolean }
   >({
     type: "task",
-    item: { id: id, index: index, title: title },
+    item: { id: id, index: index, title: title, status: status },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

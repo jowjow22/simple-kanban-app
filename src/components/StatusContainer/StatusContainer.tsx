@@ -1,50 +1,74 @@
-import { Task } from "../Task/Task";
-import { useCallback, useState } from "react";
-export const StatusContainer = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Task 1",
-    },
-    {
-      id: 2,
-      title: "Task 2",
-    },
-    {
-      id: 3,
-      title: "Task 3",
-    },
-    {
-      id: 4,
-      title: "Task 4",
-    },
-  ]);
+import { Task as TaskComponent } from "../Task/Task";
+import { useCallback, useState, useEffect } from "react";
+import { useDrop } from "react-dnd";
+import { ItemTypes } from "../../models/ItemTypes";
+import type { Task } from "../../models/Task";
+import type { Status } from "../../models/Status";
+
+interface IStatusContainerProps {
+  tasks: Task[];
+  updateOwnTasks: (
+    item: Task,
+    oldStatusAndId: { id: number; status: Status }
+  ) => void;
+  ownStatus: Status;
+}
+
+export const StatusContainer = ({
+  tasks,
+  updateOwnTasks,
+  ownStatus,
+}: IStatusContainerProps) => {
+  const [ownTasks, setOwnTasks] = useState(tasks);
+
+  useEffect(() => {
+    setOwnTasks(tasks);
+  }, [tasks]);
+
+  const [{ canDrop, isOver }, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.task,
+      drop: (item: Task) => {
+        const oldStatusAndId = {
+          id: item.id,
+          status: item.status,
+        };
+        updateOwnTasks({ ...item, status: ownStatus }, oldStatusAndId);
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
+    }),
+    [updateOwnTasks]
+  );
 
   const reOrderTasks = useCallback(
-    (dragIndex, hoverIndex) => {
-      const auxTasks = [...tasks];
+    (dragIndex: number, hoverIndex: number) => {
+      const auxTasks = [...ownTasks];
       const [removed] = auxTasks.splice(dragIndex, 1);
       auxTasks.splice(hoverIndex, 0, removed);
-      setTasks(auxTasks);
+      setOwnTasks(auxTasks);
       console.log("Reordered tasks:", auxTasks);
     },
-    [tasks]
+    [ownTasks]
   );
 
   const renderTasks = useCallback(() => {
-    return tasks.map((task, index) => (
-      <Task
+    return ownTasks.map((task, index: number) => (
+      <TaskComponent
         key={task.id}
         id={task.id}
         title={task.title}
         index={index}
+        status={task.status}
         reOrder={reOrderTasks}
       />
     ));
-  }, [reOrderTasks, tasks]);
+  }, [reOrderTasks, ownTasks]);
 
   return (
-    <div className="w-92 h-full bg-teal-200 grid place-items-center">
+    <div className="w-92 h-full bg-teal-200 grid place-items-center" ref={drop}>
       {renderTasks()}
     </div>
   );
