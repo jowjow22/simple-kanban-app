@@ -1,7 +1,4 @@
-import { Task as TaskComponent } from "../Task/Task";
-import { useCallback } from "react";
-import { useDrop } from "react-dnd";
-import { ItemTypes } from "../../models/ItemTypes";
+import { useDroppable } from "@dnd-kit/core";
 import type { Task } from "../../models/Task";
 import { Status } from "../../models/Status";
 import { TasksList } from "./components/TasksList";
@@ -9,12 +6,7 @@ import { cva } from "class-variance-authority";
 
 interface IStatusBoardProps {
   tasks: Task[];
-  updateOwnTasks: (
-    item: Task,
-    oldStatusAndId: { id: number; status: Status }
-  ) => void;
   ownStatus: Status;
-  updateOrdering: (tasks: Task[]) => void;
 }
 
 const boardVariants = cva("w-92 h-full", {
@@ -27,64 +19,28 @@ const boardVariants = cva("w-92 h-full", {
   },
 });
 
-export const StatusBoard = ({
-  tasks,
-  updateOwnTasks,
-  ownStatus,
-  updateOrdering,
-}: IStatusBoardProps) => {
-  const [{ isActive, previewItem }, drop] = useDrop(
-    () => ({
-      accept: ItemTypes.task,
-      drop: (item: Task) => {
-        const oldStatusAndId = {
-          id: item.id,
-          status: item.status,
-        };
-        if (ownStatus === oldStatusAndId.status) return;
-        updateOwnTasks({ ...item, status: ownStatus }, oldStatusAndId);
-      },
-      collect: (monitor) => ({
-        isActive:
-          monitor.isOver() &&
-          monitor.canDrop() &&
-          monitor.isOver({ shallow: true }),
-        previewItem: monitor.getItem(),
-      }),
-    }),
-    [updateOwnTasks]
-  );
-
-  const reOrderTasks = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      const auxTasks = [...tasks];
-      const [removed] = auxTasks.splice(dragIndex, 1);
-      auxTasks.splice(hoverIndex, 0, removed);
-      updateOrdering(auxTasks);
+export const StatusBoard = ({ tasks, ownStatus }: IStatusBoardProps) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `status-${ownStatus}`,
+    data: {
+      type: "status",
+      status: ownStatus,
     },
-    [tasks, updateOrdering]
-  );
+  });
 
   const boardClass = boardVariants({ status: ownStatus });
 
   return (
     <div
-      className={boardClass}
-      ref={drop as unknown as React.Ref<HTMLDivElement>}
+      className={`${boardClass} ${isOver ? "ring-2 ring-blue-500" : ""}`}
+      ref={setNodeRef}
     >
-      <TasksList tasks={tasks} reOrderTasks={reOrderTasks} />
-
-      {isActive && (
-        <TaskComponent
-          key={previewItem.id}
-          id={previewItem.id}
-          title={previewItem.title}
-          index={-1}
-          status={ownStatus}
-          reOrder={reOrderTasks}
-          isDropPreview={isActive}
-        />
-      )}
+      <h2 className="text-lg font-semibold p-4 text-center border-b">
+        {ownStatus.toUpperCase()}
+      </h2>
+      <div className="p-4 space-y-2">
+        <TasksList tasks={tasks} />
+      </div>
     </div>
   );
 };

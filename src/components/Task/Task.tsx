@@ -1,15 +1,11 @@
-import { useRef } from "react";
-import { useDrag, useDrop } from "react-dnd";
-import type { XYCoord } from "dnd-core";
-import type { Status } from "../../models/Status";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { cva } from "class-variance-authority";
-
+import { EditableText } from "../EditableText/EditableText";
+import type { Task as TaskType } from "../../models/Task";
+import useBoardsStore from "../../store/boards";
 interface ITaskProps {
-  id: number;
-  title: string;
-  index: number;
-  status: Status;
-  isDropPreview?: boolean;
+  task: TaskType;
+  isDragOverlay?: boolean;
   reOrder: (dragIndex: number, hoverIndex: number) => void;
 }
 
@@ -25,77 +21,60 @@ const taskStyles = cva(
   }
 );
 
-interface ITaskDragItem extends Omit<ITaskProps, "reOrder"> {
-  originalIndex?: number;
-}
-
-export const Task = ({
-  title,
-  index,
-  id,
-  reOrder,
-  status,
-  isDropPreview,
-}: ITaskProps) => {
-  const taskRef = useRef<HTMLDivElement>(null);
-  const [{ isDragging }, drag] = useDrag<
-    ITaskDragItem,
-    void,
-    { isDragging: boolean }
-  >({
-    type: "task",
-    item: { id: id, index: index, title: title, status: status },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+export const Task = ({ task, isDragOverlay = false }: ITaskProps) => {
+  const { id, title, description, status } = task;
+  const updateTask = useBoardsStore((state) => state.updateTask);
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragRef,
+    isDragging,
+  } = useDraggable({
+    id: `task-${id}`,
+    data: {
+      type: "task",
+      id,
+      title,
+      description,
+      status,
+    },
+    disabled: isDragOverlay,
   });
 
-  const [, drop] = useDrop<ITaskDragItem, void, { isOver: boolean }>({
-    accept: "task",
-    hover: (item, monitor) => {
-      if (!taskRef.current) return;
-
-      const dragIndex = item.index;
-      const hoverIndex = index;
-
-      if (dragIndex === hoverIndex) return;
-
-      const hoveringBoundingRect = taskRef.current.getBoundingClientRect();
-
-      const verticalCenter =
-        (hoveringBoundingRect.bottom + hoveringBoundingRect.top) / 2;
-
-      const mousePosition = monitor.getClientOffset() as XYCoord;
-
-      const mouseY = mousePosition.y - hoveringBoundingRect.top;
-
-      if (dragIndex < hoverIndex && mouseY < verticalCenter) return;
-      if (dragIndex > hoverIndex && mouseY > verticalCenter) return;
-
-      item.originalIndex ??= item.index;
-
-      item.index = hoverIndex;
+  const { setNodeRef: setDropRef } = useDroppable({
+    id: `task-drop-${id}`,
+    data: {
+      type: "task",
+      id,
+      status,
     },
-    drop: (item) => {
-      const originalIndex = item.originalIndex ?? item.index;
-      const finalIndex = index;
-
-      if (originalIndex !== finalIndex) {
-        reOrder(originalIndex, finalIndex);
-      }
-
-      delete item.originalIndex;
-    },
+    disabled: isDragOverlay,
   });
 
-  drag(drop(taskRef));
+  const setNodeRef = (node: HTMLElement | null) => {
+    if (!isDragOverlay) {
+      setDragRef(node);
+      setDropRef(node);
+    }
+  };
 
   return (
     <article
-      className={taskStyles({ isDragging: isDragging || isDropPreview })}
-      ref={taskRef}
+      className={taskStyles({
+        isDragging: isDragging && !isDragOverlay,
+      })}
+      ref={setNodeRef}
+      {...(isDragOverlay ? {} : attributes)}
+      {...(isDragOverlay ? {} : listeners)}
     >
-      <h2>{title}</h2>
+      <EditableText
+        initialText={title}
+        save={(text) => updateTask(id, { ...task, title: text })}
+      />
+      <EditableText
+        initialText={description}
+        save={(text) => updateTask(id, { ...task, description: text })}
+      />
     </article>
   );
 };
