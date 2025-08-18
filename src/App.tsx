@@ -28,7 +28,7 @@ function App() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 3,
       },
     })
   );
@@ -53,6 +53,20 @@ function App() {
 
     if (
       overData?.type === "status" &&
+      overData.status !== activeTaskData.status
+    ) {
+      const oldStatusAndId = {
+        id: activeTaskData.id,
+        status: activeTaskData.status,
+      };
+      moveTaskFromBoard(
+        { ...activeTaskData, status: overData.status },
+        oldStatusAndId
+      );
+    }
+
+    if (
+      overData?.type === "task" &&
       overData.status !== activeTaskData.status
     ) {
       const oldStatusAndId = {
@@ -98,10 +112,38 @@ function App() {
         updateFullBoard(tasks, activeTaskData.status);
       }
     }
+
+    if (
+      overData?.type === "status" &&
+      overData.status !== activeTaskData.status
+    ) {
+      const oldStatusAndId = {
+        id: activeTaskData.id,
+        status: activeTaskData.status,
+      };
+      moveTaskFromBoard(
+        { ...activeTaskData, status: overData.status },
+        oldStatusAndId
+      );
+    }
+
+    if (
+      overData?.type === "task" &&
+      overData.status !== activeTaskData.status
+    ) {
+      const oldStatusAndId = {
+        id: activeTaskData.id,
+        status: activeTaskData.status,
+      };
+      moveTaskFromBoard(
+        { ...activeTaskData, status: overData.status },
+        oldStatusAndId
+      );
+    }
   };
 
   return (
-    <main className="h-screen w-screen flex flex-row gap-x-10">
+    <main className="h-screen w-screen flex flex-row gap-x-10 justify-center mt-26">
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}

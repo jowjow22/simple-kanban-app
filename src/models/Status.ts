@@ -1,6 +1,6 @@
 enum Status {
     todo = 'todo',
-    inProgress = 'inProgress',
+    inProgress = 'In Progress',
     done = 'done',
 }
 

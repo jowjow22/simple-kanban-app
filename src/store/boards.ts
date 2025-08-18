@@ -13,10 +13,10 @@ interface BoardsState {
   addTask: (task: Task, status: Status) => void;
   moveTaskFromBoard: (
     task: Task,
-    oldStatusAndId: { status: Status; id: number }
+    oldStatusAndId: { status: Status; id: string }
   ) => void;
   updateFullBoard: (tasks: Task[], status: Status) => void;
-  updateTask: (taskId: number, newData: Task) => void;
+  updateTask: (taskId: string, newData: Task) => void;
 }
 
 const useStore = create<BoardsState>()(
@@ -24,18 +24,6 @@ const useStore = create<BoardsState>()(
     (set) => ({
       boards: {
         [Status.todo]: [
-          {
-            id: 1,
-            title: "Task 1",
-            status: Status.todo,
-            description: "Description for Task 1",
-          },
-          {
-            id: 2,
-            title: "Task 2",
-            status: Status.todo,
-            description: "Description for Task 2",
-          },
         ],
         [Status.inProgress]: [],
         [Status.done]: [],
@@ -53,7 +41,7 @@ const useStore = create<BoardsState>()(
         }),
       moveTaskFromBoard: (
         task: Task,
-        oldStatusAndId: { status: Status; id: number }
+        oldStatusAndId: { status: Status; id: string }
       ) =>
         set((state) => {
           return {
@@ -66,7 +54,7 @@ const useStore = create<BoardsState>()(
             },
           };
         }),
-      updateTask: (taskId: number, newData: Task) =>
+      updateTask: (taskId: string, newData: Task) =>
         set((state) => {
           const taskIndex = state.boards[newData.status].findIndex(
             (task) => task.id === taskId

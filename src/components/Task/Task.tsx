@@ -10,7 +10,7 @@ interface ITaskProps {
 }
 
 const taskStyles = cva(
-  "w-full h-fit border border-gray-300 p-2 bg-white shadow-sm",
+  "w-full h-fit border border-gray-300 p-2 bg-white shadow-sm transition-opacity rounded-lg",
   {
     variants: {
       isDragging: {
@@ -63,17 +63,30 @@ export const Task = ({ task, isDragOverlay = false }: ITaskProps) => {
       className={taskStyles({
         isDragging: isDragging && !isDragOverlay,
       })}
+      style={{
+        pointerEvents: isDragging && !isDragOverlay ? "none" : "auto",
+      }}
       ref={setNodeRef}
       {...(isDragOverlay ? {} : attributes)}
       {...(isDragOverlay ? {} : listeners)}
     >
-      <EditableText
-        initialText={title}
-        save={(text) => updateTask(id, { ...task, title: text })}
-      />
+      <header className="mb-2 flex flex-row items-center gap-x-3">
+        <img
+          src="https://avatar.iran.liara.run/public"
+          alt="profile picture"
+          className="w-8 h-8 rounded-full"
+        />
+        <EditableText
+          initialText={title}
+          textStyle="text-lg font-semibold"
+          save={(text) => updateTask(id, { ...task, title: text })}
+        />
+      </header>
+      <hr className="my-5 border-gray-300 " />
       <EditableText
         initialText={description}
         save={(text) => updateTask(id, { ...task, description: text })}
+        textArea
       />
     </article>
   );
