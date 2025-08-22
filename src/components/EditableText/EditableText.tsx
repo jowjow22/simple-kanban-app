@@ -63,7 +63,7 @@ export const EditableText = ({
               ref={inputRef}
               onBlur={handleSave}
               defaultValue={initialText}
-              className="border border-gray-300 pl-2 rounded-sm mr-2"
+              className="border border-gray-300 pl-2 rounded-sm mr-2 w-1/2"
             />
           )}
           <div className="flex gap-2">

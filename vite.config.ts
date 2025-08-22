@@ -9,5 +9,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      external: ['react', 'react-dom', '**/*.spect.ts'],
+    },
   }
 })

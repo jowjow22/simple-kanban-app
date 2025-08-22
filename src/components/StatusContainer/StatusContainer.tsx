@@ -6,6 +6,8 @@ import { cva } from "class-variance-authority";
 import { Tag } from "../Tag/Tag";
 import { PlusCircleIcon } from "@heroicons/react/16/solid";
 import useBoardsStore from "../../store/boards";
+import { TaskCreationForm } from "../TaskCreationForm/TaskCreationForm";
+import { useState } from "react";
 
 interface IStatusBoardProps {
   tasks: Task[];
@@ -48,6 +50,8 @@ const ringClasses = {
 };
 
 export const StatusBoard = ({ tasks, ownStatus }: IStatusBoardProps) => {
+  const [open, setOpen] = useState(false);
+
   const addTask = useBoardsStore((state) => state.addTask);
   const { setNodeRef, isOver } = useDroppable({
     id: `status-${ownStatus}`,
@@ -74,22 +78,15 @@ export const StatusBoard = ({ tasks, ownStatus }: IStatusBoardProps) => {
       <div className="p-4 space-y-2 min-h-30">
         <TasksList tasks={tasks} />
       </div>
-      <button
-        className={footerClass}
-        onClick={() =>
-          addTask(
-            {
-              id: crypto.randomUUID(),
-              title: "New Task",
-              description: "Description ",
-              status: ownStatus,
-            },
-            ownStatus
-          )
-        }
-      >
+      <button className={footerClass} onClick={() => setOpen(true)}>
         <PlusCircleIcon className="w-6 h-6" />
       </button>
+      <TaskCreationForm
+        status={ownStatus}
+        onCreate={addTask}
+        open={open}
+        onClose={() => setOpen(false)}
+      />
     </div>
   );
 };

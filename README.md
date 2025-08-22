@@ -1,72 +1,55 @@
-# React + TypeScript + Vite
+# Kanban Task Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a simple task managemant system using the kanban method, it focus on explore the different approaches to interact with drag and drop, state management and persistence.
 
-Currently, two official plugins are available:
+# Setup instructions
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Once you download the repository, install the dependencies, the package manager used is pnpm, this was chosen for its speed and efficiency.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+After that you can run the development server using the following command:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm dev
 ```
+
+Or if you want to run the production build, you can use the following command:
+
+```bash
+pnpm build
+```
+
+and then run it with
+
+```bash
+pnpm preview
+```
+
+## Architecture
+
+The project is structured into several key directories:
+
+- `src`: Contains the main application code.
+- `public`: Contains static assets such as images and icons.
+- Each component has its own test file alongside it, the test files can be run using the `pnpm test` command.
+- The state management library chosen for this project is `zustand` as it provides a simple and efficient way to manage state in React applications and middlewares that turn persistent state into a more manageable form.
+- The project uses `tailwindcss` for styling, allowing for rapid UI development with a utility-first approach. To allow using variants, `class-variance-authority` is used.
+- The testing framework used is `vitest`, which provides a powerful and flexible way to test your application, and has a better integration with Vite compared to other testing libraries.
+- The project uses `eslint` for linting, ensuring code quality and consistency across the codebase.
+- For the drag and drop functionality, the project utilizes the `@dnd-kit` library, which offers a set of hooks and components to create a customizable drag and drop experience. Previously this project was using `react-dnd` but as it no longer has support, i decided to migrate to `@dnd-kit`.
+- The project uses `@testing-library/react` for testing React components, providing a simple and effective way to test component behavior and interactions.
+- For type checking and linting, the project uses `TypeScript` and `ESLint` to ensure code quality and consistency.
+
+Future improvements could include:
+
+- Using pako for better compression of the data stored on the client-side.
+- Implementing e2e testing with a tool like Cypress.
+- Adding more comprehensive documentation and examples for using the components.
+- Improving accessibility features to ensure a better experience for all users.
+
 
 # Time of work table
 
@@ -78,3 +61,20 @@ export default tseslint.config([
 | 15/08/2025 | 3:40 PM | 4:00 PM |
 | 15/08/2025 | 6:50 PM | 10:00 PM |
 | 17/08/2025 | 8:30 PM | 10:00 PM |
+OBS: Went on a trip to the new country im living right now (Portugal)
+| 21/08/2025 | 13:35 PM | 14:45 PM |
+| 22/08/2025 | 10:00 AM | 12:00 PM |
+| 22/08/2025 | 19:00 PM | 21:00 PM |
+
+# Shortcuts taken
+
+- Used a library for drag and drop instead of implementing it from scratch.
+- Use Zustand middleware for persisting state.
+- Used copilot to help with code suggestions and fixes.
+
+# Problems during development
+
+- Faced challenges with the drag and drop implementation, particularly with handling nested elements.
+- Had a big delay in the development because of my trip to Portugal.
+- Had problems with react-dnd which made me migrate all of the previous implementation to @dnd-kit.
+- Testing the drag and drop functionality proved to be more complex than anticipated, requiring additional time and effort.

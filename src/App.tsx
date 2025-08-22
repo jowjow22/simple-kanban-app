@@ -143,26 +143,33 @@ function App() {
   };
 
   return (
-    <main className="h-screen w-screen flex flex-row gap-x-10 justify-center mt-26">
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        {boardsList.map((status) => (
-          <StatusBoard key={status} tasks={boards[status]} ownStatus={status} />
-        ))}
-        <DragOverlay>
-          {activeTask ? (
-            <TaskComponent
-              task={activeTask}
-              reOrder={() => {}}
-              isDragOverlay={true}
+    <main className="h-screen w-screen flex flex-col items-start md:p-24">
+      <h1 className="text-3xl font-bold mb-6">Kanban Board</h1>
+      <div className="flex md:flex-row justify-center items-start gap-4 w-full max-w-6xl p-4">
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          {boardsList.map((status) => (
+            <StatusBoard
+              key={status}
+              tasks={boards[status]}
+              ownStatus={status}
             />
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          ))}
+          <DragOverlay>
+            {activeTask ? (
+              <TaskComponent
+                task={activeTask}
+                reOrder={() => {}}
+                isDragOverlay={true}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </main>
   );
 }
